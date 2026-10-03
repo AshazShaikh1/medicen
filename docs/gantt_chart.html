@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Gantt Chart - Medicine Expiry Reminder System</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+    }
+    body {
+      background-color: #ffffff;
+      padding: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .chart-container {
+      width: 1000px;
+      background: #ffffff;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .chart-header {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 20px;
+      letter-spacing: -0.3px;
+    }
+    .grid-wrapper {
+      display: grid;
+      grid-template-columns: 280px 85px 1fr;
+      border-top: 1px solid #e5e7eb;
+      border-left: 1px solid #e5e7eb;
+      border-right: 1px solid #e5e7eb;
+    }
+    /* Timeline Header */
+    .header-cell {
+      padding: 10px 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+      border-bottom: 1px solid #e5e7eb;
+      border-right: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      background: #f9fafb;
+    }
+    .timeline-axis-header {
+      display: flex;
+      position: relative;
+      border-bottom: 1px solid #e5e7eb;
+      background: #f9fafb;
+      height: 38px;
+    }
+    .tick-label {
+      position: absolute;
+      font-size: 12px;
+      font-weight: 600;
+      color: #4b5563;
+      transform: translateX(-50%);
+      top: 10px;
+    }
+    /* Rows */
+    .row-task {
+      padding: 9px 12px;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: #1f2937;
+      border-bottom: 1px solid #e5e7eb;
+      border-right: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+    }
+    .row-date {
+      padding: 9px 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #4b5563;
+      border-bottom: 1px solid #e5e7eb;
+      border-right: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+    }
+    .timeline-track {
+      position: relative;
+      border-bottom: 1px solid #e5e7eb;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+    }
+    /* Vertical Grid lines */
+    .grid-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background-color: #f3f4f6;
+      z-index: 1;
+    }
+    .grid-line.major {
+      background-color: #e5e7eb;
+    }
+    /* Bar */
+    .bar {
+      position: absolute;
+      height: 18px;
+      background: #3b82f6;
+      border-radius: 3px;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+    }
+    .bar-label {
+      position: absolute;
+      left: calc(100% + 6px);
+      font-size: 11px;
+      font-weight: 600;
+      color: #374151;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+<div class="chart-container" id="gantt-chart">
+  <div class="chart-header">Medicen — Medicine Expiry Reminder System</div>
+
+  <div class="grid-wrapper">
+    <!-- Header Row -->
+    <div class="header-cell" style="justify-content: center;">Task Name</div>
+    <div class="header-cell" style="justify-content: center;">Start Date</div>
+    <div class="timeline-axis-header">
+      <!-- Total 122 days from Jun 1 to Sep 30 -->
+      <!-- Ticks at 01-Jun (0%), 15-Jun (11.5%), 01-Jul (24.6%), 15-Jul (36%), 01-Aug (50%), 15-Aug (61.5%), 01-Sep (75.4%), 15-Sep (86.9%), 30-Sep (100%) -->
+      <span class="tick-label" style="left: 0%;">01-Jun</span>
+      <span class="tick-label" style="left: 11.5%;">15-Jun</span>
+      <span class="tick-label" style="left: 24.6%;">01-Jul</span>
+      <span class="tick-label" style="left: 36.1%;">15-Jul</span>
+      <span class="tick-label" style="left: 50.0%;">01-Aug</span>
+      <span class="tick-label" style="left: 61.5%;">15-Aug</span>
+      <span class="tick-label" style="left: 75.4%;">01-Sep</span>
+      <span class="tick-label" style="left: 86.9%;">15-Sep</span>
+      <span class="tick-label" style="left: 98%;">30-Sep</span>
+    </div>
+
+    <!-- Rows Definition Function via script -->
+    <div id="chart-rows" style="display: contents;"></div>
+  </div>
+</div>
+
+<script>
+  // Timeline: Jun 1 (Day 0) to Sep 30 (Day 122)
+  const totalDays = 122;
+  const majorTicks = [0, 11.5, 24.6, 36.1, 50.0, 61.5, 75.4, 86.9, 100.0];
+
+  const tasks = [
+    { name: "Project Planning & Scope Definition", start: "01-Jun", dayStart: 0, days: 7 },
+    { name: "Requirement Gathering & Feasibility Analysis", start: "08-Jun", dayStart: 7, days: 7 },
+    { name: "Feasibility Study & Technology Finalization", start: "15-Jun", dayStart: 14, days: 8 },
+    { name: "UI Design & Healthcare Flow Wireframing", start: "22-Jun", dayStart: 21, days: 7 },
+    { name: "Database Schema Design & RLS Modeling", start: "29-Jun", dayStart: 28, days: 7 },
+    { name: "Supabase Setup & User Authentication", start: "06-Jul", dayStart: 35, days: 8 },
+    { name: "Medicine Management & CRUD Development", start: "14-Jul", dayStart: 43, days: 10 },
+    { name: "Date-Accurate Expiry Calculation Engine", start: "24-Jul", dayStart: 53, days: 8 },
+    { name: "Dashboard Overview & Metric Aggregation", start: "01-Aug", dayStart: 61, days: 8 },
+    { name: "Reminder Engine & In-App Notification Sync", start: "09-Aug", dayStart: 69, days: 9 },
+    { name: "Search, Category Filtering & Expiry Reports", start: "18-Aug", dayStart: 78, days: 8 },
+    { name: "System Integration & Security Testing", start: "26-Aug", dayStart: 86, days: 8 },
+    { name: "User Acceptance Testing & Bug Fixing", start: "03-Sep", dayStart: 94, days: 9 },
+    { name: "Project Documentation & Report Preparation", start: "12-Sep", dayStart: 103, days: 10 },
+    { name: "Final Project Review & Viva Presentation", start: "22-Sep", dayStart: 113, days: 8 }
+  ];
+
+  const container = document.getElementById('chart-rows');
+
+  tasks.forEach((t) => {
+    // Task column
+    const taskCol = document.createElement('div');
+    taskCol.className = 'row-task';
+    taskCol.textContent = t.name;
+
+    // Date column
+    const dateCol = document.createElement('div');
+    dateCol.className = 'row-date';
+    dateCol.textContent = t.start;
+
+    // Track column
+    const trackCol = document.createElement('div');
+    trackCol.className = 'timeline-track';
+
+    // Add vertical lines
+    majorTicks.forEach(pct => {
+      const line = document.createElement('div');
+      line.className = 'grid-line major';
+      line.style.left = pct + '%';
+      trackCol.appendChild(line);
+    });
+
+    // Add bar
+    const leftPct = (t.dayStart / totalDays) * 100;
+    const widthPct = (t.days / totalDays) * 100;
+
+    const bar = document.createElement('div');
+    bar.className = 'bar';
+    bar.style.left = leftPct + '%';
+    bar.style.width = widthPct + '%';
+
+    const label = document.createElement('span');
+    label.className = 'bar-label';
+    label.textContent = t.days + ' Days';
+    bar.appendChild(label);
+
+    trackCol.appendChild(bar);
+
+    container.appendChild(taskCol);
+    container.appendChild(dateCol);
+    container.appendChild(trackCol);
+  });
+</script>
+
+</body>
+</html>

@@ -12,6 +12,7 @@ export default function Navbar() {
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/medicines', label: 'Medicines' },
     { href: '/reminders', label: 'Reminders' },
+    { href: '/guide', label: 'Guide' },
   ]
 
   const isActive = (path: string) => {

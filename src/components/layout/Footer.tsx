@@ -29,6 +29,9 @@ export default function Footer() {
             <Link href="/reminders" className="hover:text-slate-600 transition-colors">
               Reminders
             </Link>
+            <Link href="/guide" className="hover:text-slate-600 transition-colors">
+              App Guide
+            </Link>
           </div>
         </div>
       </div>
